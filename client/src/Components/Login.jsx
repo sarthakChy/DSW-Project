@@ -1,5 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import styled from 'styled-components';
+import { getError } from '../Utils';
 import axios from "axios";
 
 const Login = () => {
@@ -14,13 +15,17 @@ const Login = () => {
     setInputs(inputs => ({...inputs,[name]:val}))
   }
 
-  const handleLogin = (e)=>
+  const handleLogin = async(e)=>
   {
     e.preventDefault();
 
-    const url = "http://localhost/api/login.php"
+    const url = "http://localhost:80/api/login.php"
 
-    axios.post(url,inputs);
+    
+    
+    const response = await axios.post(url, inputs, { headers: { "Content-Type": "application/json" } });
+
+    console.log(response)
   }
 
   return (
