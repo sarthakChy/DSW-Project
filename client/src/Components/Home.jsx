@@ -45,6 +45,7 @@ const Home = () => {
 // Styled Components
 
 const Container = styled.div`
+    overflow: hidden;
     font-family: 'Arial', sans-serif;
     background-color: #f0f8ff;
 `;

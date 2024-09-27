@@ -4,8 +4,8 @@ import axios from "axios";
 
 const Login = () => {
   const [inputs, setInputs] = useState({});
-  const [user,setUser] = useState("");
-
+  const [msg, setMsg] = useState("");
+  
   const handleChange = (e) => {
     const name = e.target.name;
     const val = e.target.value;
@@ -16,16 +16,28 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     const url = "http://localhost:80/api/login.php";
 
     const response = await axios.post(url, inputs, { headers: { "Content-Type": "application/json" } });
-    console.log(response);
+    
+    setMsg(response.data);
+
+    setTimeout(()=>{
+      setMsg("");
+    },'2000')
+
   }
 
   return (
     <Container>
       <LoginBox>
         <Form>
+          {
+            msg && <>
+              <p>{msg}</p>
+            </>
+          }
           <InputField>
             <Input type="text" placeholder="User name / Email" name="user" required onChange={handleChange} />
           </InputField>
@@ -42,6 +54,7 @@ const Login = () => {
 // Styled Components
 
 const Container = styled.div`
+  
   height: 100vh;
   display: flex;
   justify-content: center;
