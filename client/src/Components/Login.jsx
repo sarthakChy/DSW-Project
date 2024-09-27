@@ -1,31 +1,25 @@
-import React,{useState,useEffect} from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { getError } from '../Utils';
 import axios from "axios";
 
 const Login = () => {
+  const [inputs, setInputs] = useState({});
+  const [user,setUser] = useState("");
 
-  const [inputs,setInputs] = useState({})
-
-  const handleChange = (e)=>
-  {
+  const handleChange = (e) => {
     const name = e.target.name;
     const val = e.target.value;
     
-    setInputs(inputs => ({...inputs,[name]:val}))
+    setInputs(inputs => ({...inputs, [name]: val }));
+
   }
 
-  const handleLogin = async(e)=>
-  {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    const url = "http://localhost:80/api/login.php";
 
-    const url = "http://localhost:80/api/login.php"
-
-    
-    
     const response = await axios.post(url, inputs, { headers: { "Content-Type": "application/json" } });
-
-    console.log(response)
+    console.log(response);
   }
 
   return (
@@ -33,12 +27,12 @@ const Login = () => {
       <LoginBox>
         <Form>
           <InputField>
-            <Input type="text" placeholder="User name / Email" name = "user" required onChange={(e)=>handleChange(e)}></Input>
+            <Input type="text" placeholder="User name / Email" name="user" required onChange={handleChange} />
           </InputField>
-          <InputField> 
-            <Input type="password" placeholder="Password" name = "pass" onChange={(e)=>handleChange(e)}/>
+          <InputField>
+            <Input type="password" placeholder="Password" name="pass" onChange={handleChange} />
           </InputField>
-          <LoginButton onClick={(e)=>handleLogin(e)}>LOG IN NOW</LoginButton>
+          <LoginButton onClick={handleLogin}>LOG IN NOW</LoginButton>
         </Form>
       </LoginBox>
     </Container>
@@ -52,82 +46,68 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #d1c4e9;
+  background-color: #d1f1f0;  /* Light variant of your previous theme */
+  animation: fadeIn 0.5s ease-in-out;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 `;
 
 const LoginBox = styled.div`
-  width: 50vw;
-  height: 40vh;
+  width: 400px;
   padding: 40px;
-  background-color: #fff;
+  margin-left: 5px;
+  background-color: #ffffff;
   border-radius: 15px;
-  box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+
 `;
 
 const Form = styled.form`
-  margin-top: 10%;
-  height: 80%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
 `;
 
 const InputField = styled.div`
-  width: 85%;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 20px 35px;
+  padding: 15px 0px 15px 5px;
+  
   font-size: 16px;
   color: #333;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 5px;
+  background-color: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: #009688; /* Match your theme */
+  }
 `;
 
 const LoginButton = styled.button`
-  width: 100%;
   padding: 15px;
   font-size: 16px;
   font-weight: bold;
   color: #fff;
-  background-color: #673ab7;
+  background-color: #009688; /* Primary theme color */
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s ease;
-  
+  transition: background-color 0.3s, transform 0.2s;
+
   &:hover {
-    background-color: #5e35b1;
-  }
-`;
-
-const SocialLogin = styled.div`
-  text-align: center;
-  margin-top: 20px;
-
-  p {
-    color: #666;
-  }
-`;
-
-const SocialIcons = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-`;
-
-const SocialIcon = styled.i`
-  font-size: 20px;
-  color: #673ab7;
-  margin: 0 10px;
-  cursor: pointer;
-  
-  &:hover {
-    color: #5e35b1;
+    background-color: #00796b; /* Darker shade for hover effect */
+    transform: translateY(-2px);
   }
 `;
 
