@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import {useNavigate} from 'react-router-dom';
 import axios from "axios";
 
 const Login = () => {
   const [inputs, setInputs] = useState({});
   const [msg, setMsg] = useState("");
+
+  const navigate = useNavigate();
   
   const handleChange = (e) => {
     const name = e.target.name;
@@ -19,13 +22,28 @@ const Login = () => {
 
     const url = "http://localhost:80/api/login.php";
 
-    const response = await axios.post(url, inputs, { headers: { "Content-Type": "application/json" } });
-    
-    setMsg(response.data);
+    try
+    {
+      const response = await axios.post(url, inputs, { headers: { "Content-Type": "application/json" } });
 
-    setTimeout(()=>{
-      setMsg("");
-    },'2000')
+      setMsg(response.data);
+
+
+      localStorage.setItem("inputs",JSON.stringify(inputs));
+      
+      setTimeout(()=>{
+        setMsg("");
+        navigate("/editor");
+      },'2000')
+
+    }catch(e)
+    {
+      setMsg(e.response.data);
+      setTimeout(()=>{
+        setMsg("");
+      },'2000')
+    }
+    
 
   }
 
