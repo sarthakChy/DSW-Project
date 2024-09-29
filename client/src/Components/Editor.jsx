@@ -1,11 +1,13 @@
-import React, {useState, useCallback, useRef} from 'react'
+import React, {useState, useCallback, useRef, useEffect} from 'react'
 import Quill from 'quill';
 import 'react-quill/dist/quill.snow.css';
 import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 
 function Editor() {
 
     const valueRef = useRef("");
+    const id = useRef("");
 
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -25,6 +27,9 @@ function Editor() {
         if(wrapper == null) return
         
         wrapper.innerHTML = "";
+        id.current = uuidv4();
+        
+        localStorage.setItem("Eid", JSON.stringify({"id":id}));
 
         const editor = document.createElement("div")
         wrapper.append(editor)
@@ -42,6 +47,7 @@ function Editor() {
             valueRef.current = elements.innerHTML;
             console.log(valueRef.current);
             console.log(localStorage.getItem('inputs'));
+            console.log(localStorage.getItem("Eid"));
         }
 
     }
