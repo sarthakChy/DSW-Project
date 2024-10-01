@@ -33,7 +33,7 @@ const Login = () => {
       
       setTimeout(()=>{
         setMsg("");
-        navigate("/editor");
+        navigate(`/${inputs["user"]}/dashboard`);
       },'2000')
 
     }catch(e)
