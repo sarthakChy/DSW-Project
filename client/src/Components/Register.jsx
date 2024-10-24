@@ -14,17 +14,19 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
+    console.log('Form data being sent:', inputs);  // Log inputs to verify the data being sent
+  
     const url = "http://localhost/api/register.php";
-
     try {
-      let result = await axios.post(url, { ...inputs });
-      console.log(result.data);
+      const response = await axios.post(url, inputs, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Error during POST request", error.response?.data || error.message);
     }
-  }
-
+  };
+  
   return (
     <Container>
       <RegisterBox>

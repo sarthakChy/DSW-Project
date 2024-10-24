@@ -19,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/:user/dashboard" element={<Dashboard/>}/>
         <Route path="/editor" element={<Editor/>}/>
+
       </Routes>
     </>
   );

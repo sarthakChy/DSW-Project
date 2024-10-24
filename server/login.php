@@ -27,8 +27,6 @@ if(!$mysqli){
 }
 else{
     $mysqli->set_charset('utf8mb4');
-
-    printf("Success... %s\n", $mysqli->host_info);
     
     $dData = json_decode(file_get_contents("php://input"), true);
 
@@ -42,11 +40,15 @@ else{
       $row = $result->fetch_assoc();
       
       if ($pass === $row['password']) {
+          
+          header("HTTP/1.1 200 OK");
           echo "Login successful";
-      } else {
+      } else {          
+          header("HTTP/1.1 401 Unauth");
           echo "Invalid password";
       }
     } else {
+        header("HTTP/1.1 401 Unauth");
         echo "User not found";
     }
 

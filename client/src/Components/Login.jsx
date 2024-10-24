@@ -25,7 +25,7 @@ const Login = () => {
     try
     {
       const response = await axios.post(url, inputs, { headers: { "Content-Type": "application/json" } });
-
+      
       setMsg(response.data);
 
 
@@ -36,9 +36,13 @@ const Login = () => {
         navigate(`/${inputs["user"]}/dashboard`);
       },'2000')
 
-    }catch(e)
+
+      
+
+    }catch(error)
     {
-      setMsg(e.response.data);
+      console.log(error);
+      setMsg(error.response.data);
       setTimeout(()=>{
         setMsg("");
       },'2000')
@@ -64,6 +68,7 @@ const Login = () => {
           </InputField>
           <LoginButton onClick={handleLogin}>LOG IN NOW</LoginButton>
         </Form>
+        <p>Don`t have account?        <button onClick={()=>navigate('/signup')}>Sign Up</button></p>
       </LoginBox>
     </Container>
   );
@@ -140,6 +145,7 @@ const LoginButton = styled.button`
     background-color: #00796b; /* Darker shade for hover effect */
     transform: translateY(-2px);
   }
+
 `;
 
 export default Login;
