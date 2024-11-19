@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import {useNavigate} from 'react-router-dom';
 import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 const Login = () => {
   const [inputs, setInputs] = useState({});
@@ -33,7 +34,7 @@ const Login = () => {
       
       setTimeout(()=>{
         setMsg("");
-        navigate(`/${inputs["user"]}/dashboard`);
+        navigate(`/${inputs['user']}/dashboard`);
       },'2000')
 
 
