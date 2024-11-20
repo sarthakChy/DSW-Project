@@ -9,4 +9,14 @@ CREATE TABLE IF NOT EXISTS User (
 );
 
 
+document
 
+CREATE TABLE Document (
+    DocumentID varchar(255) PRIMARY KEY ,
+    UID INT NOT NULL,
+    Title VARCHAR(255) NOT NULL,
+    Content TEXT NOT NULL,
+    LastModified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    Visibility ENUM('Public', 'Private') NOT NULL,
+    FOREIGN KEY (UID) REFERENCES User(UID) 
+);

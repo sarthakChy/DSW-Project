@@ -1,14 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-
+import axios from 'axios';
 
 const Dashboard = () => {
 
   const {user} = useParams();
+  const [Documents,setDocuments] = useState([]);
 
+  useEffect(()=>
+  {
+    fetchDocuments();
+
+  },[])
+
+  const fetchDocuments = async () => {
+    const url = 'http://localhost:80/api/getDocument.php';
+
+    try{
+      const response = await axios.post(url,{uid:"1"},{ headers: { 'Content-Type': 'application/json' } });
+      if (response.data) {
+        setDocuments(response.data);
+        console.log(response.data);
+      } else {
+          setDocuments([]); 
+      }
+    }catch(error)
+    {
+      console.error(error.response);
+    }
+    
+  };
   return (
     <Container>
       <Header>
@@ -18,9 +42,16 @@ const Dashboard = () => {
       <Section>
         <h2>Your Documents</h2>
         <DocumentList>
-          <DocumentItem><StyledLink to="/edit/1">Document 1</StyledLink></DocumentItem>
-          <DocumentItem><StyledLink to="/edit/2">Document 2</StyledLink></DocumentItem>
-          <DocumentItem><StyledLink to="/edit/3">Document 3</StyledLink></DocumentItem>
+            {Documents.length === 0 ? (
+                <p>No documents found</p>
+            ) : (
+              <>
+                    {Documents.map((document) => (
+                        <DocumentItem><StyledLink to={`/editor/${document.DocumentID}`}>{document.Title}</StyledLink></DocumentItem>
+                    ))}
+              </>
+            )}
+                        
         </DocumentList>
         <CreateDoc>
           <StyledLink to={`/editor/${uuidv4()}`}>Create New Document</StyledLink>

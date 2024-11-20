@@ -8,9 +8,6 @@ import Dashboard from "./Components/Dashboard";
 
 function App() {
 
-  const user = localStorage.getItem("inputs")["user"];
-
-
   return (
     <>
       <Routes>

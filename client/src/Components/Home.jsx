@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 
 const Home = () => {
     return (
@@ -9,7 +8,6 @@ const Home = () => {
                 <h1>LiveDraft</h1>
                 <Nav>
                     <NavList>
-                        <Link to = '/login'>Login</Link>
                         <NavItem><NavLink href="#about">About</NavLink></NavItem>
                         <NavItem><NavLink href="#features">Features</NavLink></NavItem>
                         <NavItem><NavLink href="/login">Login</NavLink></NavItem>
