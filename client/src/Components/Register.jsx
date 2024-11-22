@@ -16,28 +16,26 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    console.log('Form data being sent:', inputs); // Log inputs to verify the data being sent
-
+    console.log(inputs)
     const url = 'http://localhost/api/register.php';
     try {
       const response = await axios.post(url, inputs, {
         headers: { 'Content-Type': 'application/json' },
       });
-      
-      setMsg(response.data);
+      console.log(response.data.message);
+      setMsg(response.data.message);
       setTimeout(() => {
         setMsg("");
         navigate(`/login`);
-      }, '2000');
-      console.log(response.data);
-      navigate('/login'); // Navigate to login page after successful registration
+      }, '1000');
+    
     } catch (error) {
       console.error('Error during POST request', error.response?.data || error.message);
     
       setMsg(error.response.data.message);
       setTimeout(() => {
         setMsg("");
-      }, '2000');
+      }, '1500');
     }
   };
   
@@ -57,6 +55,10 @@ const Register = () => {
           </InputField>
           <RegisterButton type="submit">REGISTER NOW</RegisterButton>
         </Form>
+        <FooterText>
+          Already have an account? 
+          <SignUpButton onClick={() => navigate('/login')}>Log In</SignUpButton>
+        </FooterText>
       </RegisterBox>
     </Container>
   );
@@ -127,6 +129,28 @@ const RegisterButton = styled.button`
   &:hover {
     background-color: #00796b; /* Darker shade for hover effect */
     transform: translateY(-2px);
+  }
+`;
+
+const FooterText = styled.p`
+  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+`;
+
+const SignUpButton = styled.button`
+  background: none;
+  border: none;
+  color: #009688; /* Match the theme */
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 5px;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #00796b; /* Darker shade for hover effect */
   }
 `;
 const ErrorMessage = styled.p`

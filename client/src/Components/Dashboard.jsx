@@ -9,10 +9,12 @@ const Dashboard = () => {
 
   const {user} = useParams();
   const [Documents,setDocuments] = useState([]);
+  const [DocumentCollab,setDocumentCollab] = useState([]);
 
   useEffect(()=>
   {
     fetchDocuments();
+    console.log(localStorage.getItem('user'));
 
   },[])
 
@@ -20,9 +22,10 @@ const Dashboard = () => {
     const url = 'http://localhost:80/api/getDocument.php';
 
     try{
-      const response = await axios.post(url,{uid:"1"},{ headers: { 'Content-Type': 'application/json' } });
+      const response = await axios.post(url,{user:user},{ headers: { 'Content-Type': 'application/json' } });
       if (response.data) {
-        setDocuments(response.data);
+        setDocuments(response.data['Documents']);
+        setDocumentCollab(response.data['collab']);
         console.log(response.data);
       } else {
           setDocuments([]); 
@@ -41,18 +44,24 @@ const Dashboard = () => {
 
       <Section>
         <h2>Your Documents</h2>
-        <DocumentList>
-            {Documents.length === 0 ? (
-                <p>No documents found</p>
-            ) : (
-              <>
-                    {Documents.map((document) => (
-                        <DocumentItem><StyledLink to={`/editor/${document.DocumentID}`}>{document.Title}</StyledLink></DocumentItem>
-                    ))}
-              </>
-            )}
-                        
-        </DocumentList>
+        <DocumentDiv>
+          <DocumentList>
+              {Documents?.length === 0 && DocumentCollab?.length===0 ? (
+                  <p>No documents found</p>
+              ) : (
+                <>
+                      {Documents?.map((document) => (
+                          <DocumentItem><StyledLink key={document.DocumentID} to={`/editor/${document.DocumentID}`}>{document.Title}</StyledLink></DocumentItem>
+                      ))}
+                      {DocumentCollab?.map((document) => (
+                          <DocumentItem><StyledLink key={document.DocumentID} to={`/editor/${document.DocumentID}`}>{document.Title}(Collab)</StyledLink></DocumentItem>
+                      ))}
+                </>
+              )}
+  
+                          
+          </DocumentList>
+        </DocumentDiv>
         <CreateDoc>
           <StyledLink to={`/editor/${uuidv4()}`}>Create New Document</StyledLink>
         </CreateDoc>
@@ -72,13 +81,16 @@ const Container = styled.div`
   overflow: hidden;
   font-family: 'Arial', sans-serif;
   background-color: #f0f8ff;
+  height:100vh;
 `;
 
 const Header = styled.header`
   background-color: #009688;
   color: #fff;
   padding: 2rem 1.25rem;
-  text-align: center;
+  height:7%;
+  display:flex;
+  justify-content: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 `;
 
@@ -87,10 +99,15 @@ const Section = styled.section`
   background-color: white;
   border-radius: 10px;
   padding: 2rem;
+  height:50%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   max-width: 800px;
 `;
 
+const DocumentDiv = styled.div`
+height:70%;
+overflow-y: auto;
+`
 const DocumentList = styled.ul`
   list-style: none;
   padding: 0;

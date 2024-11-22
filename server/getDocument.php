@@ -22,15 +22,31 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 $dData = json_decode(file_get_contents("php://input"), true);
 
-if (!isset($dData['uid'])) {
+if (!isset($dData['user'])) {
     header("HTTP/1.1 400 Bad Request");
     echo json_encode(["error" => "Missing UID"]);
     exit;
 }
 
-$UID = $dData['uid'];
+$User = $dData['user'];
+
+$stmt = $mysqli->prepare("SELECT UID FROM User WHERE username = ? OR email = ?");
+$stmt->bind_param("ss", $User, $User);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    header("HTTP/1.1 404 Not Found");
+    echo json_encode(["error" => "User not found"]);
+    exit;
+}
+
+$row = $result->fetch_assoc();
+$UID = $row['UID'];
 
 try {
+    $allDoc = Array();
+
     $stmt = $mysqli->prepare("SELECT DocumentID, Title FROM Document WHERE UID = ?");
     $stmt->bind_param("i", $UID);
     $stmt->execute();
@@ -41,12 +57,38 @@ try {
         while ($row = $result->fetch_assoc()) {
             $documents[] = $row;
         }
-        echo json_encode($documents);
+        $allDoc['Documents'] = $documents;
     } else {
-        echo json_encode([]);  // No documents found
+        $allDoc['Documents'] = null;  // No documents found
     }
 
     $stmt->close();
+
+
+    $stmt = $mysqli->prepare("SELECT DocumentID FROM Collaborator WHERE UID = ? and Role = 'Editor' ");
+    $stmt->bind_param("i", $UID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+        
+    if ($result->num_rows > 0) {
+        $document_collab = [];
+        while ($row = $result->fetch_assoc()) {
+            $id = $row['DocumentID'];
+            $stmt = $mysqli->prepare("SELECT DocumentID,Title FROM Document WHERE DocumentID = ?");
+            $stmt->bind_param("s", $id);
+            $stmt->execute();
+            $result2 = $stmt->get_result();
+            $r = $result2->fetch_assoc();
+            $document_collab[] =  $r;
+        }
+        $allDoc['collab'] = $document_collab;
+    } else {
+        $allDoc['collab'] = null;  // No documents found
+    }
+
+    echo json_encode($allDoc);
+    $stmt->close();
+
 } catch (Exception $e) {
     header("HTTP/1.1 500 Internal Server Error");
     echo json_encode(["error" => "Failed to retrieve documents", "details" => $e->getMessage()]);

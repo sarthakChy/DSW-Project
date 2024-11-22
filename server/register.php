@@ -1,58 +1,5 @@
 <?php
 
-/* // header('Access-Control-Allow-Origin: *');
-// header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
-// header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
-
-//B6FoKbULmDP5eTAP
-//debian-sys-maint
-
-header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Methods: HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization");
-header('Content-Type: application/json');
-$method = $_SERVER['REQUEST_METHOD'];
-if ($method == "OPTIONS") {
-header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization");
-header("HTTP/1.1 200 OK");
-die();
-}
-
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$mysqli = new mysqli('localhost', 'debian-sys-maint', 'B6FoKbULmDP5eTAP', 'Live_text');
-if(!$mysqli){
-    echo "error in connection";
-}
-else{
-    $mysqli->set_charset('utf8mb4');
-
-    printf("Success... %s\n", $mysqli->host_info);
-    $dData = json_decode(file_get_contents("php://input"));
-    
-    $user = $dData['user'];
-    $pass = $dData['pass'];
-    
-    $UID = 2;
-$username = "b";
-$password = "b";
-$email = "b@gmail.com";
-
-$q = "INSERT INTO User (UID, username, email, date_created, password) 
-      VALUES ($UID, '$username', '$email', CURRENT_DATE(), '$password')";
-
-if ($mysqli->query($q)) {
-    echo "New record created successfully";
-} else {
-    echo "Error: " . $q . "<br>" . mysqli_error($mysqli);
-}
-} */
-
-
-
-
-
 // Enable error reporting for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -65,8 +12,6 @@ header('Content-Type: application/json');
 
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method == "OPTIONS") {
-    header('Access-Control-Allow-Origin: *');
-    header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization");
     header("HTTP/1.1 200 OK");
     die();
 }
@@ -99,34 +44,52 @@ try {
         exit();
     }
 
-    // Check if email already exists
-    $sql = "SELECT email FROM User WHERE email = ?";
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Check if username already exists
+    $sqlUsername = "SELECT username FROM User WHERE username = ?";
+    $stmtUsername = $mysqli->prepare($sqlUsername);
+    $stmtUsername->bind_param('s', $username);
+    $stmtUsername->execute();
+    $resultUsername = $stmtUsername->get_result();
 
-    if ($result->num_rows > 0) {
+    if ($resultUsername->num_rows > 0) {
+        header("HTTP/1.1 409 Conflict");
+        echo json_encode(["status" => "error", "message" => "Username already exists"]);
+        exit(); // Stop further execution if username exists
+    }
+
+
+    // Check if email already exists
+    $sqlEmail = "SELECT email FROM User WHERE email = ?";
+    $stmtEmail = $mysqli->prepare($sqlEmail);
+    $stmtEmail->bind_param('s', $email);
+    $stmtEmail->execute();
+    $resultEmail = $stmtEmail->get_result();
+
+    if ($resultEmail->num_rows > 0) {
         header("HTTP/1.1 409 Conflict");
         echo json_encode(["status" => "error", "message" => "Email already exists"]);
-    } else {
-        // Insert new user into the database with auto-incremented UID and current timestamp for date_created
-        $sql = "INSERT INTO User (username, email, password) VALUES (?, ?, ?)";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('sss', $username, $email, $password);
+        exit(); // Stop further execution if email exists
+    }
 
-        if ($stmt->execute()) {
-            header("HTTP/1.1 201 Created");
-            echo json_encode(["status" => "success", "message" => "Registration successful"]);
-        } else {
-            throw new Exception("Database insertion failed: " . $stmt->error);
-        }
+    // Debugging: Log email check passed
+    error_log("Email check passed");
+
+    // Insert new user into the database
+    $sqlInsert = "INSERT INTO User (username, email, password) VALUES (?, ?, ?)";
+    $stmtInsert = $mysqli->prepare($sqlInsert);
+    $stmtInsert->bind_param('sss', $username, $email, $password);
+
+    if ($stmtInsert->execute()) {
+        header("HTTP/1.1 201 Created");
+        echo json_encode(["status" => "success", "message" => "Registration successful"]);
+    } else {
+        throw new Exception("Database insertion failed: " . $stmtInsert->error);
     }
 
 } catch (Exception $e) {
     // Catch and log errors
     header("HTTP/1.1 500 Internal Server Error");
-    error_log($e->getMessage());  // Log error message for debugging
+    error_log($e->getMessage());
     echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
 

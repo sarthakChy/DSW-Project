@@ -31,7 +31,7 @@ if (!isset($dData['docid'])) {
     exit;
 }
 
-$UID = $dData['uid'];
+
 $Doc_id = $dData['docid'];
 
 // Fetch the document from the database

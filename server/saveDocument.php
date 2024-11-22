@@ -25,13 +25,13 @@ $mysqli->set_charset('utf8mb4');
 $dData = json_decode(file_get_contents("php://input"), true);
 
 // Check if the necessary fields are provided
-if (!isset($dData['uid'], $dData['title'], $dData['content'], $dData['visibility'], $dData['docid'])) {
+if (!isset($dData['user'], $dData['title'], $dData['content'], $dData['visibility'], $dData['docid'])) {
     header("HTTP/1.1 400 Bad Request");
     echo json_encode(["error" => "Missing required fields"]);
     exit;
 }
 
-$UID = $dData['uid'];
+$User = $dData['user'];
 $Doc_id = $dData['docid'];
 $Title = $dData['title'];
 $Content = $dData['content'];
@@ -44,17 +44,33 @@ if (!in_array($Visibility, ['Public', 'Private', 'Shared'])) {
     exit;
 }
 
-// Check if the document already exists
-$stmt = $mysqli->prepare("SELECT DocumentID FROM Document WHERE DocumentID = ? AND UID = ?");
-$stmt->bind_param("ii", $Doc_id, $UID);
+
+$stmt = $mysqli->prepare("SELECT UID FROM User WHERE username = ? OR email = ?");
+$stmt->bind_param("ss", $User, $User);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    header("HTTP/1.1 404 Not Found");
+    echo json_encode(["error" => "User not found"]);
+    exit;
+}
+
+$row = $result->fetch_assoc();
+$UID = $row['UID'];
+$Role = 'Creator';
+
+//Check if the document already exists
+$stmt = $mysqli->prepare("SELECT DocumentID FROM Document WHERE DocumentID = ?");
+$stmt->bind_param("s", $Doc_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     // Document exists, perform UPDATE
     try {
-        $stmt = $mysqli->prepare("UPDATE Document SET Title = ?, Content = ?, Visibility = ?, LastModified = CURRENT_TIMESTAMP WHERE DocumentID = ? AND UID = ?");
-        $stmt->bind_param("ssssi", $Title, $Content, $Visibility, $Doc_id, $UID);
+        $stmt = $mysqli->prepare("UPDATE Document SET Title = ?, Content = ?, Visibility = ?, LastModified = CURRENT_TIMESTAMP WHERE DocumentID = ?");
+        $stmt->bind_param("ssss", $Title, $Content, $Visibility, $Doc_id);
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
@@ -80,6 +96,19 @@ if ($result->num_rows > 0) {
             echo json_encode(["error" => "Failed to create document"]);
         }
         $stmt->close();
+
+
+        $stmt = $mysqli->prepare("INSERT INTO Collaborator (DocumentID, UID, Role) VALUES (?, ?, ?)");
+        $stmt->bind_param("sis", $Doc_id, $UID, $Role);
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            echo json_encode(["success" => true, "message" => "Collaborator created successfully"]);
+        } else {
+            echo json_encode(["error" => "Failed to create Collaborator"]);
+        }
+        $stmt->close();
+
     } catch (Exception $e) {
         header("HTTP/1.1 500 Internal Server Error");
         echo json_encode(["error" => "Failed to save document", "details" => $e->getMessage()]);

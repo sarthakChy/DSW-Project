@@ -23,17 +23,19 @@ const Login = () => {
     try {
       const response = await axios.post(url, inputs, { headers: { 'Content-Type': 'application/json' } });
       setMsg(response.data);
-      localStorage.setItem('inputs', JSON.stringify(inputs));
+
+      localStorage.setItem('user',inputs['user']);
+
       setTimeout(() => {
         setMsg("");
         navigate(`/${inputs['user']}/dashboard`);
-      }, '2000');
+      }, '1000');
     } catch (error) {
       console.log(error);
       setMsg(error.response.data);
       setTimeout(() => {
         setMsg("");
-      }, '2000');
+      }, '1500');
     }
   };
 
