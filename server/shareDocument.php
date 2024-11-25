@@ -59,6 +59,7 @@ if($result->num_rows > 0)
 {
     header("HTTP/1.1 409 Conflict");
     echo json_encode(["status" => "error", "message" => "Already shared to this User"]);
+    exit;
 }
 
 else{

@@ -43,3 +43,49 @@ CREATE TABLE DocumentVersion (
     FOREIGN KEY (DocumentID) REFERENCES Document(DocumentID) ON DELETE CASCADE
 );
 
+procedure
+
+DELIMITER $$
+
+CREATE PROCEDURE InsertDocumentVersion(
+    IN p_DocumentID VARCHAR(255),
+    IN p_Content TEXT
+)
+BEGIN
+    DECLARE versionCount INT;
+    DECLARE nextVersionNo INT;
+
+    -- Check if DocumentID exists
+    IF NOT EXISTS (SELECT 1 FROM Document WHERE DocumentID = p_DocumentID) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'DocumentID does not exist in Document table.';
+    END IF;
+
+    -- Count the current versions for the document
+    SELECT COUNT(*) INTO versionCount
+    FROM DocumentVersion
+    WHERE DocumentID = p_DocumentID;
+
+    -- If the count exceeds or equals 3, delete the oldest version
+    IF versionCount >= 3 THEN
+        DELETE FROM DocumentVersion
+        WHERE DocumentID = p_DocumentID
+        ORDER BY VersionNo ASC
+        LIMIT 1;
+    END IF;
+
+    -- Calculate the next VersionNo
+    SELECT IFNULL(MAX(VersionNo), 0) + 1 INTO nextVersionNo
+    FROM DocumentVersion
+    WHERE DocumentID = p_DocumentID;
+
+    -- Insert the new version with the calculated VersionNo
+    INSERT INTO DocumentVersion (DocumentID, VersionNo, Content)
+    VALUES (p_DocumentID, nextVersionNo, p_Content);
+END $$
+
+DELIMITER ;
+
+
+call 
+
+CALL InsertDocumentVersion('DOC123', 'This is the content of the new version.');

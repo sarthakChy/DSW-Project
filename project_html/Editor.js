@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const content = quill.getContents();
       const title = document.getElementById('title').value || "Untitled";
       const url = 'http://localhost:80/api/saveDocument.php';
-  
+      const curl = 'http://localhost:80/api/saveCreator.php';
+
       try {
         
         const response = await fetch(url, {
@@ -60,8 +61,41 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         
         const data = await response.json();
-
+        console.log(data);
         alert(data.message);
+
+        setTimeout(()=>{
+          window.location.reload();
+        },1000);
+        
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+
+    const saveCreator = async () => {
+      const content = quill.getContents();
+      const title = document.getElementById('title').value || "Untitled";
+      const url = 'http://localhost:80/api/saveCreator.php';
+
+      try {
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user: user,
+            docid: documentId,
+            title: title,
+            content: JSON.stringify(content),
+            visibility: "Private"
+          }),
+        });
+        
+        const data = await response.json();
+        console.log(data);
+        //alert(data.message);
 
         setTimeout(()=>{
           window.location.reload();
@@ -164,6 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
     // Save Button
     document.getElementById("saveButton").addEventListener("click", saveDocument);
+    document.getElementById("saveButton").addEventListener("click", saveCreator);
   
     // Share Button
     document.getElementById("popupButton").addEventListener("click", () => {

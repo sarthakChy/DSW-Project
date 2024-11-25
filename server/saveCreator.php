@@ -67,44 +67,20 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    // Document exists, perform UPDATE
-    try {
-        $stmt = $mysqli->prepare("UPDATE Document SET Title = ?, Content = ?, Visibility = ?, LastModified = CURRENT_TIMESTAMP WHERE DocumentID = ?");
-        $stmt->bind_param("ssss", $Title, $Content, $Visibility, $Doc_id);
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "Document updated successfully"]);
-        } else {
-            echo json_encode(["error" => "No changes made to the document"]);
-        }
-        $stmt->close();
-
-        $stmt = $mysqli->prepare("CALL InsertDocumentVersion( ?, ?)");
-        $stmt->bind_param("ss",$Doc_id,$Content);
-        $stmt->execute();
-        $stmt->close();
-    } catch (Exception $e) {
-        header("HTTP/1.1 500 Internal Server Error");
-        echo json_encode(["error" => "Failed to update document", "details" => $e->getMessage()]);
-    }
+    //document already exist
 } else {
     // Document doesn't exist, perform INSERT
     try {
-        $stmt = $mysqli->prepare("INSERT INTO Document (DocumentID, UID, Title, Content, Visibility) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sisss", $Doc_id, $UID, $Title, $Content, $Visibility);
+
+        $stmt = $mysqli->prepare("INSERT INTO Collaborator (UID, DocumentID, Role) VALUES (?,?,?)");
+        $stmt->bind_param("iss", $UID, $Doc_id, $Role);
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            echo json_encode(['message'=>'Document saved successfully']);
+            echo json_encode(["message" => "Creator saved successfully"]);
         } else {
-            echo json_encode(["error" => "Failed to create document"]);
+            echo json_encode(["error" => "Failed to create creator"]);
         }
-        $stmt->close();
-
-        $stmt = $mysqli->prepare("CALL InsertDocumentVersion( ?, ?)");
-        $stmt->bind_param("ss",$Doc_id,$Content);
-        $stmt->execute();
         $stmt->close();
 
     } catch (Exception $e) {
