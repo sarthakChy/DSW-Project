@@ -43,8 +43,3 @@ CREATE TABLE DocumentVersion (
     FOREIGN KEY (DocumentID) REFERENCES Document(DocumentID) ON DELETE CASCADE
 );
 
-
-
-
-
-

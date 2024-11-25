@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const url = new URL(window.location.href);
     const documentId = url.searchParams.get('docid');
     const documentList = document.getElementById('document-list');
-    const userName = localStorage.getItem('user') || 'Guest';
+    const user = localStorage.getItem('user') || 'Guest';
     let quill = null;
   
     const toolbarOptions = [
@@ -26,7 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ docid: documentId }),
         });
+
         const data = await response.json();
+
         if (data) {
           document.getElementById('title').value = data.Title || "Untitled";
           if (data.Content) {
@@ -49,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user: userName,
+            user: user,
             docid: documentId,
             title: title,
             content: JSON.stringify(content),
@@ -96,22 +98,22 @@ document.addEventListener("DOMContentLoaded", function () {
           const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user:userName }),
+            body: JSON.stringify({ user:user }),
           });
     
           const data = await response.json();
     
-          if (data.Documents?.length > 0 || data.collab?.length > 0) {
+          if (data?.Documents?.length > 0 || data?.collab?.length > 0) {
             //noDocumentsMessage.style.display = 'none';
     
-            data.Documents.forEach(doc => {
+            data?.Documents?.forEach(doc => {
               const listItem = document.createElement('li');
               listItem.className = 'document-item';
               listItem.innerHTML = `<a class="styled-link" href="/Editor.html?docid=${doc.DocumentID}">${doc.Title}</a>`;
               documentList.appendChild(listItem);
             });
     
-            data.collab.forEach(doc => {
+            data?.collab?.forEach(doc => {
               const listItem = document.createElement('li');
               listItem.className = 'document-item';
               listItem.innerHTML = `<a class="styled-link" href="/Editor.html?docid=${doc.DocumentID}">${doc.Title} (Collab)</a>`;
@@ -171,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
     // Home Navigation
     document.getElementById("home-link").addEventListener("click", () => {
-      window.location.href = `/${userName}/dashboard`;
+      window.location.href = `/Dashboard.html?user=${user}`;
     });
   });
   

@@ -18,17 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
   
         const data = await response.json();
   
-        if (data.Documents?.length > 0 || data.collab?.length > 0) {
+        if (data?.Documents?.length > 0 || data?.collab?.length > 0) {
           noDocumentsMessage.style.display = 'none';
   
-          data.Documents.forEach(doc => {
+          data?.Documents?.forEach(doc => {
             const listItem = document.createElement('li');
             listItem.className = 'document-item';
             listItem.innerHTML = `<a class="styled-link" href="/Editor.html?docid=${doc.DocumentID}">${doc.Title}</a>`;
             documentList.appendChild(listItem);
           });
   
-          data.collab.forEach(doc => {
+          data?.collab?.forEach(doc => {
             const listItem = document.createElement('li');
             listItem.className = 'document-item';
             listItem.innerHTML = `<a class="styled-link" href="/Editor.html?docid=${doc.DocumentID}">${doc.Title} (Collab)</a>`;
