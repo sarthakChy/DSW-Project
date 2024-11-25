@@ -24,7 +24,7 @@ $dData = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($dData['user'])) {
     header("HTTP/1.1 400 Bad Request");
-    echo json_encode(["error" => "Missing UID"]);
+    echo json_encode(["error" => "Missing User"]);
     exit;
 }
 

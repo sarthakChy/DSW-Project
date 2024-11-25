@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="Dashboard.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Welcome to <span id="user-name"></span>'s Dashboard</h1>
+    </header>
+
+    <section class="section">
+      <h2>Your Documents</h2>
+      <div class="document-div">
+        <ul class="document-list" id="document-list">
+          <p id="no-documents-message" style="display: none;">No documents found</p>
+        </ul>
+      </div>
+      <div class="create-doc">
+        <a id="create-document-link" href="#" class="styled-link">Create New Document</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>&copy; 2024 LiveDraft. All rights reserved.</div>
+      <div>Founders: Sarthak Choudhary | Yash Kumar Singh | Asmit Agarwal | Sparsh Aggarwal</div>
+    </footer>
+  </div>
+  <script src="Dashboard.js"></script>
+</body>
+</html>

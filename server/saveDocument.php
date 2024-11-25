@@ -91,23 +91,12 @@ if ($result->num_rows > 0) {
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "Document created successfully"]);
+            echo json_encode(["success" => true, "message" => "Document saved successfully"]);
         } else {
             echo json_encode(["error" => "Failed to create document"]);
         }
         $stmt->close();
 
-
-        $stmt = $mysqli->prepare("INSERT INTO Collaborator (DocumentID, UID, Role) VALUES (?, ?, ?)");
-        $stmt->bind_param("sis", $Doc_id, $UID, $Role);
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "Collaborator created successfully"]);
-        } else {
-            echo json_encode(["error" => "Failed to create Collaborator"]);
-        }
-        $stmt->close();
 
     } catch (Exception $e) {
         header("HTTP/1.1 500 Internal Server Error");
